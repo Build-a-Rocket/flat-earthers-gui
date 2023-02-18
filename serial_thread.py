@@ -20,8 +20,8 @@ class SerialThread(QObject):
         self.serial = serial_instance
         self.alive = True
 
-        self.writeSignal = write_signal
-        self.writeSignal.connect(self.write)
+        #self.writeSignal = write_signal
+        #self.writeSignal.connect(self.write)
 
     def stop(self):
         """Stop the reader thread"""
