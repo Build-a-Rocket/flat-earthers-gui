@@ -15,8 +15,8 @@ class UI(QWidget):
         uic.loadUi("gsw.ui", self)
 
         # Initiate serial port
-        self.serial_port = Serial(None, 2000000, dsrdtr=True)
-        self.serial_port.port = "COM6"
+        self.serial_port = Serial(None, 115200, dsrdtr=True)
+        self.serial_port.port = "/dev/cu.usbmodem1101"
 
         # Initiate Serial Thread
         self.serialThread = SerialThread(self.serial_port)
@@ -28,6 +28,8 @@ class UI(QWidget):
         self.serialThread.readFailed.connect(self.error_on_read)
 
         self._thread.started.connect(self.serialThread.run)
+
+        self.allData = ""
 
         self._thread.start()
 
@@ -51,8 +53,20 @@ class UI(QWidget):
     @QtCore.pyqtSlot(bytes)
     def updateOutputBox(self, data):
         try:
-            message = unicode(data, errors='ignore')
-            self.outputBox.insertPlainText(message)
+            self.allData += unicode(data, errors='ignore')
+
+            if self.allData.find('START') != -1 and self.allData.find('END') != -1:
+                s = self.allData.find('START')
+                e = self.allData.find('END')
+
+                message = self.allData[s + 5:e + 3].split(',')
+                self.allData = self.allData[e + 3:]
+
+                telemetry = 'Altitude: %s\nTemperature: %s\n\n' % (message[1], message[2])
+
+                self.outputBox.insertPlainText(telemetry)
+                self.outputBox.ensureCursorVisible()
+
         except Exception as e:
             print(str(e))
 
