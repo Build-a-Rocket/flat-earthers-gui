@@ -33,8 +33,6 @@ class UI(QWidget):
 
         self.allData = ""
 
-        #self._thread.start()
-
         self.outputBox = self.findChild(QTextEdit, "outputBox")
         self.serialThread.dataReceived.connect(self.updateOutputBox)
 
@@ -63,6 +61,8 @@ class UI(QWidget):
         self.y = 0
         
         self.sendButton = self.findChild(QPushButton, "sendButton")
+        
+        self._thread.start()
 
     @QtCore.pyqtSlot()
     def connection_success(self):
@@ -85,25 +85,25 @@ class UI(QWidget):
                 s = self.allData.find('START')
                 e = self.allData.find('END')
 
-                message = self.allData[s + 5:e + 3].split(',')
+                data = self.allData[s + 5:e + 3].split(',')
                 self.allData = self.allData[e + 3:]
 
-                telemetry = 'Altitude: %s\nTemperature: %s\n\n' % (message[1], message[2])
+                telemetry = 'Altitude: %s\nTemperature: %s\n\n' % (data[1], data[2])
                 
                 #graph stuff!
                 self.y += 1
                 
                 self.altitudeGraph.plotData(float(data[1]), self.y)
                 
-                self.tempGraph.plotData(float(data[1]), self.y)
+                self.tempGraph.plotData(float(data[2]), self.y)
                 
                 self.accelGraph.plotData(float(data[3]), self.y, 'x')
-                self.accelGraph.plotData(float(data[3]), self.y, 'y')
-                self.accelGraph.plotData(float(data[3]), self.y, 'z')
+                self.accelGraph.plotData(float(data[4]), self.y, 'y')
+                self.accelGraph.plotData(float(data[5]), self.y, 'z')
                 
-                self.gyroGraph.plotData(float(data[3]), self.y, 'x')
-                self.gyroGraph.plotData(float(data[3]), self.y, 'x')
-                self.gyroGraph.plotData(float(data[3]), self.y, 'x')
+                self.gyroGraph.plotData(float(data[6]), self.y, 'x')
+                self.gyroGraph.plotData(float(data[7]), self.y, 'x')
+                self.gyroGraph.plotData(float(data[8]), self.y, 'x')
                 
                 
                 self.outputBox.insertPlainText(telemetry)
