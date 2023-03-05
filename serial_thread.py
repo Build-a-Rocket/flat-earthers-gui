@@ -18,6 +18,7 @@ class SerialThread(QObject):
         """
         QObject.__init__(self)
         self.serial = serial_instance
+        serial_instance.close()
         self.alive = True
 
         #self.writeSignal = write_signal

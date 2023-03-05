@@ -1,9 +1,11 @@
 from PyQt6.QtCore import QThread, pyqtSignal, QMetaObject
 from PyQt6.QtWidgets import QApplication, QWidget, QTextEdit, QPushButton
 from PyQt6 import uic, QtCore
+from pyqtgraph import PlotWidget
 from serial import Serial, unicode
 
 from serial_thread import SerialThread
+from tele_graph import TelemetryGraph
 
 
 class UI(QWidget):
@@ -15,8 +17,8 @@ class UI(QWidget):
         uic.loadUi("gsw.ui", self)
 
         # Initiate serial port
-        self.serial_port = Serial(None, 115200, dsrdtr=True)
-        self.serial_port.port = "/dev/cu.usbmodem1101"
+        self.serial_port = Serial('COM6', 115200, dsrdtr=True)
+        ####self.serial_port.port = "/dev/cu.usbmodem1101"
 
         # Initiate Serial Thread
         self.serialThread = SerialThread(self.serial_port)
@@ -31,11 +33,35 @@ class UI(QWidget):
 
         self.allData = ""
 
-        self._thread.start()
+        #self._thread.start()
 
         self.outputBox = self.findChild(QTextEdit, "outputBox")
         self.serialThread.dataReceived.connect(self.updateOutputBox)
 
+
+        # SETUP GRAPHS       
+        self.altitudeGraph = TelemetryGraph(self.findChild(PlotWidget, 'altitudeGraph'))
+        self.altitudeGraph.setTitle('Altitude')
+        self.altitudeGraph.addLine()
+        
+        self.tempGraph = TelemetryGraph(self.findChild(PlotWidget, 'tempGraph'))
+        self.tempGraph.setTitle('Tempurature')
+        self.tempGraph.addLine()
+        
+        self.accelGraph = TelemetryGraph(self.findChild(PlotWidget, 'accelGraph'))
+        self.accelGraph.setTitle('Acceleration')
+        self.accelGraph.addLine('x', 'red')
+        self.accelGraph.addLine('y', 'blue')
+        self.accelGraph.addLine('z', 'green')
+       
+        self.gyroGraph= TelemetryGraph(self.findChild(PlotWidget, 'gyroGraph'))
+        self.gyroGraph.setTitle('Gyro')
+        self.gyroGraph.addLine('x', 'red')
+        self.gyroGraph.addLine('y', 'blue')
+        self.gyroGraph.addLine('z', 'green')
+        
+        self.y = 0
+        
         self.sendButton = self.findChild(QPushButton, "sendButton")
 
     @QtCore.pyqtSlot()
@@ -63,7 +89,23 @@ class UI(QWidget):
                 self.allData = self.allData[e + 3:]
 
                 telemetry = 'Altitude: %s\nTemperature: %s\n\n' % (message[1], message[2])
-
+                
+                #graph stuff!
+                self.y += 1
+                
+                self.altitudeGraph.plotData(float(data[1]), self.y)
+                
+                self.tempGraph.plotData(float(data[1]), self.y)
+                
+                self.accelGraph.plotData(float(data[3]), self.y, 'x')
+                self.accelGraph.plotData(float(data[3]), self.y, 'y')
+                self.accelGraph.plotData(float(data[3]), self.y, 'z')
+                
+                self.gyroGraph.plotData(float(data[3]), self.y, 'x')
+                self.gyroGraph.plotData(float(data[3]), self.y, 'x')
+                self.gyroGraph.plotData(float(data[3]), self.y, 'x')
+                
+                
                 self.outputBox.insertPlainText(telemetry)
                 self.outputBox.ensureCursorVisible()
 
