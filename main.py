@@ -17,11 +17,7 @@ class UI(QWidget):
         uic.loadUi("gsw.ui", self)
 
         # Initiate serial port
-        
-        #self.serial_port = Serial('/dev/cu.usbmodem1101', 2000000, dsrdtr=True)
-        
-        # unix
-        self.serial_port = Serial('/dev/cu.usbmodem101', 2000000, dsrdtr=True)
+        self.serial_port = Serial('COM6', 115200, dsrdtr=True)
         ####self.serial_port.port = "/dev/cu.usbmodem1101"
 
         # Initiate Serial Thread
@@ -106,8 +102,8 @@ class UI(QWidget):
                 self.accelGraph.plotData(float(data[5]), self.y, 'z')
                 
                 self.gyroGraph.plotData(float(data[6]), self.y, 'x')
-                self.gyroGraph.plotData(float(data[7]), self.y, 'y')
-                self.gyroGraph.plotData(float(data[8]), self.y, 'z')
+                self.gyroGraph.plotData(float(data[7]), self.y, 'x')
+                self.gyroGraph.plotData(float(data[8]), self.y, 'x')
                 
                 
                 self.outputBox.insertPlainText(telemetry)
