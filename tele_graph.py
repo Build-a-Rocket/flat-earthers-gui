@@ -4,9 +4,9 @@ import pyqtgraph
 class TelemetryGraph:
     def __init__ (self, graph, legend=False):
         self._graph = graph
-        self._graph.setBackground('w')
+        self._graph.setBackground('black')
         
-        self.style = {'color': '#000000', 'font-size': '12px'}
+        self.style = {'color': '#FFFFFF', 'font-size': '12px'}
         
         self.y_limit = 30
         
@@ -19,7 +19,7 @@ class TelemetryGraph:
             self.graph.addLegend(offset=(0, 0))
             
             
-    def addLine(self, name='default', color='black'):
+    def addLine(self, name='default', color='white'):
         self._x[name] = [0]
         self._y[name] = [0]
         self._pen[name] = pyqtgraph.mkPen(color=color)
@@ -39,7 +39,7 @@ class TelemetryGraph:
     def setBackground(self, color='w'):
         self._graph.setBackground(color)
         
-    def setTitle(self, name, color = 'black'):
+    def setTitle(self, name, color = 'white'):
         self._graph.setTitle(name, color=color, size='12pt')
         
     def setYaxis(self, name):
