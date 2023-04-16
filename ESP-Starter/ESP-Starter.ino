@@ -6,7 +6,6 @@
 #include "radio_helpers.h"
 #include "Adafruit_BMP3XX.h"
 #include <Adafruit_LSM6DSOX.h>
-#include "camera_interface.h"
 
 // I2C Pins
 #define I2C_SCL 2
@@ -35,8 +34,6 @@ Adafruit_BMP3XX bmp;
 
 // lsm
 Adafruit_LSM6DSOX lsm;
-
-byte *frame;
 
 void setup()
 {
@@ -110,11 +107,6 @@ void setup()
 
   Serial.println("LSM Found");
   RadioHelpers::writeMessage("LSM Found");
-
-  ESP_CAMERA::init_camera();
-  frame = (byte *)malloc(10000);
-
-  RadioHelpers::writeMessage("Camera Initialized");
   
   Serial.println("Setup Complete");
   RadioHelpers::writeMessage("Setup Complete");
@@ -143,15 +135,9 @@ void loop()
   telemetry += String(g.gyro.x) + ",";
   telemetry += String(g.gyro.y) + ",";
   telemetry += String(g.gyro.z) + ",";
-  telemetry += "TEP\n";
+  telemetry += "END\n";
   
   RadioHelpers::writeMessage(telemetry);
-
-  // int bytes = ESP_CAMERA::get_frame(frame, false);
-  // if (bytes > 0)
-  // {
-  //   RadioHelpers::writeBytes(frame, bytes);
-  // }
   
   delay(100);
 }
